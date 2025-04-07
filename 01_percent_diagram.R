@@ -26,7 +26,10 @@ chiro_conc <- chiro_sum %>%
 
 chiro_perc <- chiro_long %>%
   left_join(chiro_sum) %>% 
-  mutate(rel_abund = count/count_sum*100)
+  left_join(chiro_conc[which(chiro_conc$param == "concentration"),]) %>% 
+  mutate(rel_abund = count/count_sum*100) %>% 
+  select(!param) %>% 
+  rename(concentration = value)
 
 chiro_zero <- chiro_perc %>% 
   group_by(taxon) %>%
@@ -49,11 +52,40 @@ chiro_plot <- chiro_red %>%
   geom_colh(width = 0.5, position = "dodgev") + 
   facet_abundanceh(vars(taxon)) +
   facet_abundanceh(vars(taxon), rotate_facet_labels = 90) +
-  labs(x = "Relative abundance (%)", y = NULL, fill = "Sample Type")
-  
-  
-  geom_hline(yintercept = c(5.75, 23.75, 31.75, 35.75),
-             col = "darkblue", lty = 1, alpha = 0.1, size = 2) +
-  scale_y_reverse(breaks = c(breaks = seq(0, 40, by = 5)), 
-                  labels = as.character(c(breaks = seq(0, 40, by = 5))),
-                  expand = expansion(mult = c(0.02, 0.02)))
+  labs(x = "Relative abundance (%)", y = NULL, fill = "Sample Type") +
+  scale_fill_manual(values = c(
+    "modern" = "green",
+    "post-tsunami" = "orange",
+    "pre-tsunami top" = "darkblue",
+    "pre-tsunami bot" = "blue"
+  ),
+    breaks = c("modern", "post-tsunami", "pre-tsunami top", "pre-tsunami bot"))
+
+chiro_conc_plot <- ggplot(chiro_red, aes(x = concetration, y = core_id, fill = sample_type)) +
+  geom_lineh() +
+  geom_point() +
+  scale_y_reverse() +
+  facet_geochem_gridh(vars(component), grouping = vars(location)) +
+  labs(x = NULL)
+
+chiro_red_rev <- chiro_perc %>% 
+  filter(!taxon %in% chiro_zero$taxon) %>% 
+  group_by(taxon) %>% 
+  filter(max(rel_abund) <= 4) %>% 
+  ungroup()
+
+chiro_plot_rare <- chiro_red_rev %>% 
+  mutate(taxon = as.factor(taxon)) %>% 
+  mutate(taxon = fct_relevel(taxon, chiro_order)) %>% 
+  ggplot(aes(x = rel_abund, y = core_id, fill = sample_type)) +
+  geom_colh(width = 0.5, position = "dodgev") + 
+  facet_abundanceh(vars(taxon)) +
+  facet_abundanceh(vars(taxon), rotate_facet_labels = 90) +
+  labs(x = "Relative abundance (%)", y = NULL, fill = "Sample Type") +
+  scale_fill_manual(values = c(
+    "modern" = "green",
+    "post-tsunami" = "orange",
+    "pre-tsunami top" = "darkblue",
+    "pre-tsunami bot" = "blue"
+  ),
+  breaks = c("modern", "post-tsunami", "pre-tsunami top", "pre-tsunami bot"))
