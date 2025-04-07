@@ -61,7 +61,7 @@ chiro_plot <- chiro_red %>%
   ),
     breaks = c("modern", "post-tsunami", "pre-tsunami top", "pre-tsunami bot"))
 
-chiro_conc_plot <- ggplot(chiro_red, aes(x = concetration, y = core_id, fill = sample_type)) +
+chiro_conc_plot <- ggplot(chiro_red, aes(x = concentration, y = core_id, fill = sample_type)) +
   geom_lineh() +
   geom_point() +
   scale_y_reverse() +
