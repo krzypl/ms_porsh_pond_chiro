@@ -1,12 +1,12 @@
 core_id,depth_from,depth_to,volume,Ablabesmyia,Brillia,Chironomus anthracinus-type,Cladopelma lateralis-type,Cladotanytarsus mancus-type,Corynoneura edwardsi-type,Cricotopus bicintus-type,Cricotopus cylindraceus-type,Cricotopus sylvestris-type,Cryptochironomus,Dicrotendipes nervosus-type,Endochironomus albipennis-type,Eukiefferiella claripennis-type,Glyptotendipes barbipes-type,Glyptotendipes pallens-type,Heterotrissocladius grimshawi-type,Heterotanytarsus,Lasiodiamesa,Limnophyes,Micropsectra insignilobus-type,Microtendipes pedellus-type,Mnodiamesa,Neozavrelia,Pagastiella,Parachironomus varus-type,Paracladius,Paracricotopus,Parakiefferiella bathophila-type,Parametriocnemus,Paratanytarsus austriacus-type,Paratendipes nudisquama-type,Polypedilum nubeculosum-type,Procladius,Protanypus,Psectrocladius calcaratus-type,Psectrocladius septentrionalis-type,Psectrocladius sordidellus-type,Pseudorthocladius,Pseudosmittia,Smittia foliacea-type,Tanytarsus chinyensis-type,Tanytarsus lactescens-type,Tanytarsus mendax-type,Tanytarsus pallidicornis-type,Cladotanytarsus group A,Tanypus,Thienemannimyia-type,Tribelos,Xenoxchironomus,Zalutschia type B,Zavrelia,Zavreliella
-TL09_A_20m,26.5,27,3,1,0,0,3,31,2,0,3,0,0,0,2,0,0,7,5,0,0,39,2,5,0,0,1,0,0,4,0,11,14,0,5,2,0,0,0,8,4,1,2,0,0,11,27,1,0,0,0,0,1,3,3
-TL09_A_20m,27,27.5,3,0,0,1,5,28,1,0,0,0,3,1,0,0,0,0,1,0,0,34,1,25,0,0,2,0,0,5,1,2,8,0,13,0,1,0,0,5,2,6,0,0,1,2,20,0,0,1,1,0,1,5,1
-TL09_A_20m,21,21.5,3,0,0,1,0,1,2,0,0,0,0,0,0,0,0,0,2,2,0,3,0,2,0,0,1,0,0,0,1,0,3,0,4,0,0,0,0,3,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0
-TL09_A_20m,0,0.5,3,0,0,1,0,6,4,0,2,0,2,0,0,0,1,0,1,0,0,3,0,7,0,0,0,0,0,0,0,1,6,0,8,3,1,0,0,3,0,0,0,0,0,7,12,0,0,0,0,0,0,0,0
-TL09_C_110cm,0,0.5,3,7,0,14,1,11,9,0,2,0,3,1,4,0,0,0,0,1,0,9,0,13,0,3,0,0,0,3,3,3,15,0,9,10,0,0,0,2,0,0,1,0,1,16,14,2,0,2,1,0,1,0,0
-TL09_C_110cm,36.5,37,2,0,0,0,2,8,0,0,1,0,0,1,0,0,0,1,1,0,0,6,0,4,0,0,0,0,0,0,0,2,7,0,3,0,0,0,0,3,2,0,2,0,3,4,3,2,0,1,0,0,0,0,0
-TL09_C_110cm,43,43.5,2,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,12,0,2,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,1,4,1,2,0,0,2,1,2,0,0,0,0,1,0,0
-TL09_C_110cm,43.5,44,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,2,0,0,9,0,3,0,0,1,0,0,1,0,1,3,0,1,0,0,0,1,2,0,1,7,0,0,2,1,3,0,0,0,0,3,0,0
+TL09_A_20,26.5,27,3,1,0,0,3,31,2,0,3,0,0,0,2,0,0,7,5,0,0,39,2,5,0,0,1,0,0,4,0,11,14,0,5,2,0,0,0,8,4,1,2,0,0,11,27,1,0,0,0,0,1,3,3
+TL09_A_20,27,27.5,3,0,0,1,5,28,1,0,0,0,3,1,0,0,0,0,1,0,0,34,1,25,0,0,2,0,0,5,1,2,8,0,13,0,1,0,0,5,2,6,0,0,1,2,20,0,0,1,1,0,1,5,1
+TL09_A_20,21,21.5,3,0,0,1,0,1,2,0,0,0,0,0,0,0,0,0,2,2,0,3,0,2,0,0,1,0,0,0,1,0,3,0,4,0,0,0,0,3,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0
+TL09_A_20,0,0.5,3,0,0,1,0,6,4,0,2,0,2,0,0,0,1,0,1,0,0,3,0,7,0,0,0,0,0,0,0,1,6,0,8,3,1,0,0,3,0,0,0,0,0,7,12,0,0,0,0,0,0,0,0
+TL09_C_110,0,0.5,3,7,0,14,1,11,9,0,2,0,3,1,4,0,0,0,0,1,0,9,0,13,0,3,0,0,0,3,3,3,15,0,9,10,0,0,0,2,0,0,1,0,1,16,14,2,0,2,1,0,1,0,0
+TL09_C_110,36.5,37,2,0,0,0,2,8,0,0,1,0,0,1,0,0,0,1,1,0,0,6,0,4,0,0,0,0,0,0,0,2,7,0,3,0,0,0,0,3,2,0,2,0,3,4,3,2,0,1,0,0,0,0,0
+TL09_C_110,43,43.5,2,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,12,0,2,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,1,4,1,2,0,0,2,1,2,0,0,0,0,1,0,0
+TL09_C_110,43.5,44,3,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,2,0,0,9,0,3,0,0,1,0,0,1,0,1,3,0,1,0,0,0,1,2,0,1,7,0,0,2,1,3,0,0,0,0,3,0,0
 TL09_C_70,0,0.5,3,0,0,1,0,10,2,0,2,0,1,3,0,0,0,0,2,0,2,7,0,11,0,0,0,0,0,0,0,0,4,0,6,4,0,0,0,0,0,1,0,0,0,8,5,1,0,0,0,0,1,3,0
 TL09_C_70,35,35.5,3,0,1,1,0,1,2,0,0,0,0,1,1,0,0,0,4,1,0,12,0,6,0,0,1,0,0,0,0,2,3,0,1,0,0,0,0,2,0,2,1,0,0,2,2,2,0,0,0,0,1,2,0
 TL09_C_70,40.5,41,3,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,3,3,0,17,0,4,0,0,0,0,0,1,1,1,6,1,3,2,1,0,0,0,1,2,1,0,0,3,11,4,0,0,1,0,0,2,0
