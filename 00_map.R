@@ -15,10 +15,8 @@ library(rcartocolor)
 library(cowplot)
 library(metR)
 library(OpenStreetMap)
-#install.packages("package_2_install/maptools_1.1-8.tar.gz", repos = NULL, type = "source")
-library(maptools)
-#install.packages("package_2_install/ggsn_0.5.0.tar.gz", repos = NULL, type = "source")
-library(ggsn)
+library(ggspatial)
+library(terra)
 data(world)
 
 #map - panels A and B ------
@@ -69,6 +67,7 @@ bp2map_prep <- openmap(c(46.8625,-55.75), c(46.8775, -55.775),
 )
 
 bp2map <- openproj(bp2map_prep, projection = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+bp2map_epsg <- openproj(bp2map, projection = "EPSG:3857")
 
 ewbrks <- seq(-55.8, -55.72, by = 0.01)
 nsbrks <- seq(46.862, 46.878, by = 0.01)
@@ -80,29 +79,95 @@ lake_panel <- tibble(
   ymax = 46.87092
 )
 
+
+wgs84_xbreaks_in_3857 <- function(lon_breaks, lat_for_transform) {
+  pts <- st_as_sf(
+    data.frame(lon = lon_breaks, lat = lat_for_transform),
+    coords = c("lon", "lat"), crs = 4326
+  )
+  pts_3857 <- st_transform(pts, 3857)
+  st_coordinates(pts_3857)[, "X"]
+}
+
+wgs84_ybreaks_in_3857 <- function(lat_breaks, lon_for_transform) {
+  pts <- st_as_sf(
+    data.frame(lon = lon_for_transform, lat = lat_breaks),
+    coords = c("lon", "lat"), crs = 4326
+  )
+  pts_3857 <- st_transform(pts, 3857)
+  st_coordinates(pts_3857)[, "Y"]
+}
+
+lab_lon <- function(x) paste0(sprintf("%.2f", abs(x)), "°", ifelse(x < 0, "W", "E"))
+lab_lat <- function(x) paste0(sprintf("%.3f", abs(x)), "°", ifelse(x < 0, "S", "N"))
+
+ewbrks <- seq(-55.8, -55.72, by = 0.01)
+nsbrks <- seq(46.865, 46.878, by = 0.01)
+
+xbrks_3857 <- wgs84_xbreaks_in_3857(ewbrks, lat_for_transform = mean(nsbrks))
+ybrks_3857 <- wgs84_ybreaks_in_3857(nsbrks, lon_for_transform = mean(ewbrks))
+
+stopifnot(length(xbrks_3857) == length(ewbrks))
+stopifnot(length(ybrks_3857) == length(nsbrks))
+
+lake_panel <- tibble(
+  xmin = -55.76443,
+  xmax = -55.76192,
+  ymin = 46.86920,
+  ymax = 46.87092
+)
+
+lake_3857 <- lake_panel |>
+  rowwise() |>
+  mutate(
+    ll = st_transform(st_sfc(st_point(c(xmin, ymin)), crs = 4326), 3857),
+    ur = st_transform(st_sfc(st_point(c(xmax, ymax)), crs = 4326), 3857),
+    xmin_m = st_coordinates(ll)[1,1],
+    ymin_m = st_coordinates(ll)[1,2],
+    xmax_m = st_coordinates(ur)[1,1],
+    ymax_m = st_coordinates(ur)[1,2],
+    xmid_m = (xmin_m + xmax_m)/2,
+    ymid_m = (ymin_m + ymax_m)/2
+  ) |>
+  ungroup()
+
 bp_map <-
-  autoplot.OpenStreetMap(bp2map) +
-  scalebar(x.min = -55.774, x.max = -55.763,
-           y.min = 46.864, y.max = 46.87,
-           dist = 0.4, dist_unit = "km",
-           st.dist = 0.05, st.bottom = FALSE,
-           st.color = "white", st.size = 3,
-           location = "bottomleft", box.color = "white",
-           border.size = 0.1,
-           transform = TRUE, model = "WGS84") +
-  annotation_north_arrow(style = north_arrow_fancy_orienteering,
-                         location = "tr") +
-  scale_y_latitude(breaks = nsbrks, position = "right") +
-  scale_x_longitude(breaks = ewbrks) +
+  autoplot.OpenStreetMap(bp2map_epsg) +
+  coord_equal(expand = FALSE) +
+  annotation_scale(bar_cols = c("gray", "white"), text_col = "white") +
+  annotation_north_arrow(
+    location = "tr",
+    style = north_arrow_fancy_orienteering(
+      text_col = "white",
+      line_col = "white",
+      fill = c("white")
+    )
+  ) +
+  scale_x_continuous(
+    breaks = xbrks_3857,
+    labels = function(x) lab_lon(ewbrks)
+  ) +
+  scale_y_continuous(
+    breaks = ybrks_3857,
+    labels = function(y) lab_lat(nsbrks),
+    position = "right"
+  ) +
+  annotate("text",
+           x = lake_3857$xmid_m, y = lake_3857$ymid_m + 300,
+           label = "Porsh Pond", colour = "deepskyblue", size = 4, fontface = "bold") +
+  annotate("segment", x = lake_3857$xmid_m, xend = lake_3857$xmid_m,
+           y = lake_3857$ymid_m + 250, yend = lake_3857$ymid_m, linewidth = 0.5, color = "deepskyblue",
+           arrow = arrow(length = unit(0.2, "cm"))) +
   labs(x = NULL, y = NULL, title = "(B)") +
-  theme_bw()
+  theme_bw() +
+  theme(plot.margin = margin(0, 0, 0, 0))
 
 maps_wrapped <- wrap_plots(
   nf_map,
   bp_map)
 
 final_map <- ggdraw(maps_wrapped) +
-  draw_plot(inset_map, x = 0.135, y = 0.67, width = 0.25, height = 0.15)
+  draw_plot(inset_map, x = 0.25, y = 0.76, width = 0.24, height = 0.15)
 
 ggsave(filename="figures/fig_1_panel_a_b.pdf",
        plot = final_map,
@@ -126,30 +191,56 @@ ggsave(filename="figures/fig_1_panel_a_b.svg",
        units = "in")
 
 #map, panel C -------
+depth_points <- read.csv("data/depth_sounding_data.csv", header = TRUE, sep = ";") |>
+  rename(y = ycoord, x = xcoord)
+
+cores_coord <- read_csv("data/sediment_cores_coord.csv")
+
+cores_sf <- st_as_sf(cores_coord, coords = c("x", "y"), crs = 4326)
+
+cores_as_soundings <- cores_coord |>
+  transmute(soundingID = core_id, x, y, depth = depth * 100)
+
+soundings <- bind_rows(depth_points, cores_as_soundings)
+
+soundings_sf <- st_as_sf(soundings, coords = c("x", "y"), crs = 4326)
+
+# crs_m <- 32620
+# p_m    <- st_transform(p_sf, crs_m)
+# lake_m <- st_transform(lake_contour_sf, crs_m)
 
 depth_points <- read.csv("data/depth_sounding_data.csv", head = TRUE, sep = ";") %>% 
   rename(y = ycoord, x = xcoord)
 
+cores_coord_4dp <- cores_coord %>% 
+  mutate(depth = depth*100)
+
+names(cores_coord_4dp) <- c("soundingID", "x", "y", "depth")
+
+depth_points <- depth_points %>% 
+  add_row(cores_coord_4dp)
+
 depth_points_sf = st_as_sf(depth_points, coords = c("x", "y"))
-depth_points_sf
 
 depth_points_sf <- st_set_crs(depth_points_sf, value = "EPSG:4326")
-plot(depth_points_sf)
-
-depth_zero <- depth_points_sf %>% 
-  filter(!depth == 0)
-
+# 
+# bb <- st_bbox(lake_m)
+# lake_grid <- st_as_stars(bb, dx = 1, dy = 1)
+# st_crs(lake_grid) <- st_crs(lake_m)
+# lake_grid <- lake_grid[lake_m]
 lake_contour <- st_read("data/tl09_contour.shp")
 
+bb <- st_bbox(lake_contour)
+lake_grid <- st_as_stars(bb, dx = 1, dy = 1)
+st_crs(lake_grid) <- st_crs(lake_contour)
+lake_grid <- lake_grid[lake_contour]
+
+tps <-Tps(st_coordinates(depth_points_sf), depth_points_sf$depth, lambda = 0.0003)
+
 lake_bbox <- st_bbox(lake_contour)
-
 lake_raster <- st_as_stars(lake_bbox, dx = 0.00001, dy = 0.00001)
-
 st_crs(lake_raster) <- st_crs(lake_contour)
-
 lake_raster_clipped <- lake_raster[lake_contour]
-
-tps <- Tps(st_coordinates(depth_points_sf), depth_points_sf$depth)
 lake_raster_clipped$tps_pred <- predict(tps, st_coordinates(lake_raster_clipped))
 splain_lake <- lake_raster_clipped[lake_contour]
 
@@ -160,30 +251,24 @@ lake_raster_map <- lake_raster_clipped_filled[lake_contour]
 
 lake_raster_map$tps_pred <- (lake_raster_map$tps_pred + 1.675122)/100
 
-breaks_seq <- seq(0, 1.8,
-                  by = 0.6)
+breaks_seq <- seq(0, 1.8, by = 0.6)
 
-cores_coord <- read_csv("data/sediment_cores_coord.csv")
+crs_m <- 32621
 
-cores_coord_sf <- st_as_sf(cores_coord, coords = c("x", "y"))
+cores_utm   <- st_transform(cores_sf, crs_m)
+contour_utm <- st_transform(lake_contour, crs_m)
+raster_utm <- st_warp(lake_raster_map, crs = st_crs(crs_m), method = "near")
 
-cores_coord_sf <- st_set_crs(cores_coord_sf, value = "EPSG:4326")
-
-lake_raster_map_plot <- 
-  tm_shape(lake_raster_map) +
-  tm_raster(
-    col = "tps_pred",
-    col.scale = tm_scale_intervals(
-      values = "brewer.blues",
-      breaks = breaks_seq
-    ),
-    col.legend = tm_legend(title = "Depth (m)")
-  ) +
-  tm_shape(lake_contour) + 
-  tm_borders(lwd = 2, col = "black") +
-  tm_shape(cores_coord_sf) +
+lake_bathy_contours <- 
+  tm_shape(raster_utm,
+           unit = "m") +
+  tm_raster(col = "tps_pred",
+            col.scale = tm_scale_intervals(values="brewer.blues", breaks=breaks_seq),
+            col.legend = tm_legend(title="Depth (m)")) +
+  tm_shape(contour_utm) + tm_borders(lwd = 2, col = "black") +
+  tm_shape(cores_utm) +
   tm_symbols(size = 1) +
-  tm_shape(cores_coord_sf) +
+  tm_shape(cores_utm) +
   tm_text(
     "core_id", 
     col = "black", 
@@ -192,11 +277,8 @@ lake_raster_map_plot <-
     size = 0.8,
     ymod = 1,
     fontface = "bold") +
-  tm_scalebar(position = c("left", "bottom"), text.size = 1) +
-  tm_layout(legend.position = c("left", "top")) #+
-#  tm_compass(position = c("right", "top"), text.size = 1, size = 2)
+  tm_scalebar(position = c("left", "bottom"), text.size = 1, breaks = c(0, 50, 100)) +
+  tm_layout(legend.position = c("left", "top"))
 
-lake_raster_map_plot
-
-tmap_save(lake_raster_map_plot, filename = "figures/fig_1_panel_c.pdf")
-tmap_save(lake_raster_map_plot, filename = "figures/fig_1_panel_c.svg")
+tmap_save(lake_bathy_contours, filename = "figures/fig_1_panel_c.pdf")
+tmap_save(lake_bathy_contours, filename = "figures/fig_1_panel_c.svg")
