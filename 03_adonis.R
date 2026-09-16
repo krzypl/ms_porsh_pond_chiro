@@ -26,9 +26,9 @@ spe_perc <- (spe/spe_rowsums)*100
 
 #Test whether there is a lake-scale difference in chironomid assamblages between the sample classes
 set.seed(12)
-pw_adonis_global <- pairwise.adonis2(
+pw_blocked <- pairwise.adonis2(
   spe_perc ~ sample_type,
   data = meta_cnts,
+  strata = "core_id",
   nperm = 9999
 )
-

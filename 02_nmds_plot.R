@@ -45,6 +45,7 @@ set.seed(12)
 pw_adonis <- pairwise.adonis2(
   spe_perc ~ sample_type,
   data = meta_cnts,
+  strata = "core_id",
   nperm = 9999
 )
 
